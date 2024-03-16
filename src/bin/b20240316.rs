@@ -49,7 +49,7 @@ impl Solution {
             let d2 = l2_digits.get(i).unwrap_or(&0);
             let sum = d1 + d2 + carry;
             if sum >= 10 {
-                sum_digits[i] = 0;
+                sum_digits[i] = sum - 10;
                 carry = 1;
             } else {
                 carry = 0;
@@ -94,6 +94,15 @@ mod tests {
         let l1 = create_list(vec![9]);
         let l2 = create_list(vec![1, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
         let expected = create_list(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        let result = Solution::add_two_numbers(l1, l2);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_add_two_numbers_4() {
+        let l1 = create_list(vec![9, 9, 9, 9, 9, 9, 9]);
+        let l2 = create_list(vec![9, 9, 9, 9]);
+        let expected = create_list(vec![8, 9, 9, 9, 0, 0, 0, 1]);
         let result = Solution::add_two_numbers(l1, l2);
         assert_eq!(result, expected);
     }
