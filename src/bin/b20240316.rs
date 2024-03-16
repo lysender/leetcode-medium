@@ -60,7 +60,6 @@ impl Solution {
         if carry > 0 {
             sum_digits.push(carry);
         }
-
         create_list(sum_digits)
     }
 }
