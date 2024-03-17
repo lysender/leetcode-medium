@@ -114,7 +114,19 @@ impl Solution {
     }
 
     pub fn length_of_longest_substring(s: String) -> i32 {
-        0
+        let mut longest: usize = 0;
+        let mut stack: Vec<u8> = Vec::new();
+
+        for ch in s.as_bytes().iter() {
+            if let Some(index) = stack.iter().position(|x| x == ch) {
+                // Already exists, remove all elements before the existing index
+                // including the duplicate element itself
+                stack.splice(0..(index + 1), []);
+            }
+            stack.push(*ch);
+            longest = longest.max(stack.len());
+        }
+        longest as i32
     }
 }
 
@@ -126,18 +138,18 @@ mod tests {
 
     #[test]
     fn test_length_of_longest_substring() {
-        // assert_eq!(
-        //     Solution::length_of_longest_substring(String::from("abcabcbb")),
-        //     3
-        // );
-        // assert_eq!(
-        //     Solution::length_of_longest_substring(String::from("bbbbb")),
-        //     1
-        // );
-        // assert_eq!(
-        //     Solution::length_of_longest_substring(String::from("pwwkew")),
-        //     3
-        // );
+        assert_eq!(
+            Solution::length_of_longest_substring(String::from("abcabcbb")),
+            3
+        );
+        assert_eq!(
+            Solution::length_of_longest_substring(String::from("bbbbb")),
+            1
+        );
+        assert_eq!(
+            Solution::length_of_longest_substring(String::from("pwwkew")),
+            3
+        );
     }
 
     #[test]
