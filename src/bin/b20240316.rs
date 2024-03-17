@@ -4,6 +4,7 @@ fn main() {
     Solution::add_two_numbers(None, None);
     Solution::add_two_numbers_v2(None, None);
     Solution::length_of_longest_substring(String::from("abcabcbb"));
+    Solution::longest_palindrome(String::from("babad"));
 }
 
 struct Solution {}
@@ -128,6 +129,10 @@ impl Solution {
         }
         longest as i32
     }
+
+    pub fn longest_palindrome(s: String) -> String {
+        s
+    }
 }
 
 #[cfg(test)]
@@ -135,6 +140,18 @@ mod tests {
     use leetcode_medium::create_list;
 
     use super::*;
+
+    #[test]
+    fn test_longest_palindrome() {
+        assert_eq!(
+            Solution::longest_palindrome(String::from("babad")),
+            String::from("bab")
+        );
+        assert_eq!(
+            Solution::longest_palindrome(String::from("cbbd")),
+            String::from("bb")
+        );
+    }
 
     #[test]
     fn test_length_of_longest_substring() {
