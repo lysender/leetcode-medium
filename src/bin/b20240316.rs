@@ -5,6 +5,7 @@ fn main() {
     Solution::add_two_numbers_v2(None, None);
     Solution::length_of_longest_substring(String::from("abcabcbb"));
     Solution::longest_palindrome(String::from("babad"));
+    Solution::longest_palindrome_expansion(String::from("babad"));
 }
 
 struct Solution {}
@@ -131,7 +132,7 @@ impl Solution {
     }
 
     pub fn is_palindrome(line: &[u8]) -> bool {
-        // Compare them from both ends inward
+        // Compare from edges inward until no match is found
         let mut left: i32 = 0;
         let mut right: i32 = line.len() as i32 - 1;
 
@@ -173,6 +174,62 @@ impl Solution {
 
         match longest {
             Some(sub) => String::from_utf8_lossy(&line[sub.0..sub.1]).to_string(),
+            None => "".to_string(),
+        }
+    }
+
+    pub fn longest_palindrome_expansion(s: String) -> String {
+        let line = s.as_bytes();
+        let mut longest: Option<(i32, i32)> = None;
+
+        for i in 0..line.len() {
+            // Use two pointers, l and r
+            // From current position, expand outward until we found a non-matching pair
+            // Do this for odd and for even mode
+
+            // Expand in odd mode (pointers start at same node)
+            let mut l: i32 = i as i32;
+            let mut r: i32 = i as i32;
+            while l >= 0 && r <= line.len() as i32 - 1 {
+                if line[l as usize] != line[r as usize] {
+                    break;
+                }
+                if let Some((x, y)) = longest {
+                    if (r - l + 1) > (y - x + 1) {
+                        longest = Some((l, r));
+                    }
+                } else {
+                    longest = Some((l, r));
+                }
+                l -= 1;
+                r += 1;
+            }
+
+            // Expand in even mode (pointers start beside each other)
+            l = i as i32;
+            r = l + 1;
+            while l >= 0 && r <= line.len() as i32 - 1 {
+                if line[l as usize] != line[r as usize] {
+                    break;
+                }
+                if let Some((x, y)) = longest {
+                    if (r - l + 1) > (y - x + 1) {
+                        longest = Some((l, r));
+                    }
+                } else {
+                    longest = Some((l, r));
+                }
+                l -= 1;
+                r += 1;
+            }
+        }
+
+        match longest {
+            Some(val) => {
+                let start = val.0 as usize;
+                let end = val.1 as usize;
+                String::from_utf8_lossy(&line[start..=end]).to_string()
+            }
             None => "".to_string(),
         }
     }
@@ -220,6 +277,36 @@ mod tests {
     #[test]
     fn test_longest_palindrome_big_payload() {
         let val = Solution::longest_palindrome(String::from("wsgdzojcrxtfqcfkhhcuxxnbwtxzkkeunmpdsqfvgfjhusholnwrhmzexhfqppatkexuzdllrbaxygmovqwfvmmbvuuctcwxhrmepxmnxlxdkyzfsqypuroxdczuilbjypnirljxfgpuhhgusflhalorkcvqfknnkqyprxlwmakqszsdqnfovptsgbppvejvukbxaybccxzeqcjhmnexlaafmycwopxntuisxcitxdbarsicvwrvjmxsapmhbbnuivzhkgcrshokkioagwidhmfzjwwywastecjsolxmhfnmgommkoimiwlgwxxdsxhuwwjhpxxgmeuzhdzmuqhmhnfwwokgvwsznfcoxbferdonrexzanpymxtfojodcfydedlxmxeffhwjeegqnagoqlwwdctbqnuxngrgovrjesrkjrfjawknbrsfywljscfvnjhczhyeoyzrtbkvvfvofykkwoiclgxyaddhpdoztdhcbauaagjmfzkkdqexkczfsztckdlujgqzjyuittnudpldjvsbwbzcsazjpxrwfafievenvuetzcxynnmskoytgznvqdlkhaowjtetveahpjguiowkiuvikwewmgxhgfjuzkgrkqhmxxavbriftadtogmhlatczusxkktcsyrnwjbeshifzbykqibghmmvecwwtwdcscikyzyiqlgwzycptlxiwfaigyhrlgtjocvajcnqyenxrnjgogeqtvkxllxpuoxargzgcsfwavwbnktchwjebvwwhfghqkcjhuhuqwcdsixrkfjxuzvhjxlyoxswdlwfytgbtqbeimzzogzrlovcdpseoafuxfmrhdswwictsctawjanvoafvzqanvhaohgndbsxlzuymvfflyswnkvpsvqezekeidadatsymbvgwobdrixisknqpehddjrsntkqpsfxictqbnedjmsveurvrtvpvzbengdijkfcogpcrvwyf"));
+        println!("{}", val);
+    }
+
+    #[test]
+    fn test_longest_palindrome_expansion() {
+        assert_eq!(
+            Solution::longest_palindrome_expansion(String::from("babad")),
+            String::from("bab")
+        );
+        assert_eq!(
+            Solution::longest_palindrome_expansion(String::from("cbbd")),
+            String::from("bb")
+        );
+        assert_eq!(
+            Solution::longest_palindrome_expansion(String::from("a")),
+            String::from("a")
+        );
+        assert_eq!(
+            Solution::longest_palindrome_expansion(String::from("bb")),
+            String::from("bb")
+        );
+        assert_eq!(
+            Solution::longest_palindrome_expansion(String::from("bbb")),
+            String::from("bbb")
+        );
+    }
+
+    #[test]
+    fn test_longest_palindrome_expansion_big_payload() {
+        let val = Solution::longest_palindrome_expansion(String::from("wsgdzojcrxtfqcfkhhcuxxnbwtxzkkeunmpdsqfvgfjhusholnwrhmzexhfqppatkexuzdllrbaxygmovqwfvmmbvuuctcwxhrmepxmnxlxdkyzfsqypuroxdczuilbjypnirljxfgpuhhgusflhalorkcvqfknnkqyprxlwmakqszsdqnfovptsgbppvejvukbxaybccxzeqcjhmnexlaafmycwopxntuisxcitxdbarsicvwrvjmxsapmhbbnuivzhkgcrshokkioagwidhmfzjwwywastecjsolxmhfnmgommkoimiwlgwxxdsxhuwwjhpxxgmeuzhdzmuqhmhnfwwokgvwsznfcoxbferdonrexzanpymxtfojodcfydedlxmxeffhwjeegqnagoqlwwdctbqnuxngrgovrjesrkjrfjawknbrsfywljscfvnjhczhyeoyzrtbkvvfvofykkwoiclgxyaddhpdoztdhcbauaagjmfzkkdqexkczfsztckdlujgqzjyuittnudpldjvsbwbzcsazjpxrwfafievenvuetzcxynnmskoytgznvqdlkhaowjtetveahpjguiowkiuvikwewmgxhgfjuzkgrkqhmxxavbriftadtogmhlatczusxkktcsyrnwjbeshifzbykqibghmmvecwwtwdcscikyzyiqlgwzycptlxiwfaigyhrlgtjocvajcnqyenxrnjgogeqtvkxllxpuoxargzgcsfwavwbnktchwjebvwwhfghqkcjhuhuqwcdsixrkfjxuzvhjxlyoxswdlwfytgbtqbeimzzogzrlovcdpseoafuxfmrhdswwictsctawjanvoafvzqanvhaohgndbsxlzuymvfflyswnkvpsvqezekeidadatsymbvgwobdrixisknqpehddjrsntkqpsfxictqbnedjmsveurvrtvpvzbengdijkfcogpcrvwyf"));
         println!("{}", val);
     }
 
