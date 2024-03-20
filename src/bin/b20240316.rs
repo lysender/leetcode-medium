@@ -130,17 +130,13 @@ impl Solution {
         longest as i32
     }
 
-    pub fn is_palindrome(items: &[u8]) -> bool {
-        if items.len() <= 1 {
-            return true;
-        }
-
+    pub fn is_palindrome(line: &[u8]) -> bool {
         // Compare them from both ends inward
-        let mut left: usize = 0;
-        let mut right: usize = items.len() - 1;
+        let mut left: i32 = 0;
+        let mut right: i32 = line.len() as i32 - 1;
 
         while left <= right {
-            if items[left] != items[right] {
+            if line[left as usize] != line[right as usize] {
                 return false;
             }
             left += 1;
@@ -150,40 +146,33 @@ impl Solution {
     }
 
     pub fn longest_palindrome(s: String) -> String {
-        if s.len() <= 1 {
-            return s;
-        }
-
-        let items = s.as_bytes();
-        let mut longest: Option<&[u8]> = None;
+        let line = s.as_bytes();
+        let mut longest: Option<(usize, usize)> = None;
 
         // Brute force every possibility
-        for x in 0..(items.len() - 1) {
-            for y in (x + 1)..=items.len() {
+        for x in 0..line.len() {
+            for y in (x + 1)..=line.len() {
                 //   0 1 2 3 4 5 6 7 8 9
                 //   0 1 2 3 4 5 6 7 8 9
                 // Slice it then check if it is a palindrome
-                let sub = &items[x..y];
-                if Solution::is_palindrome(sub) {
-                    println!(
-                        "x: {}, y: {}, sub: {}",
-                        x,
-                        y,
-                        String::from_utf8_lossy(sub).to_string()
-                    );
-                    if let Some(longest_pal) = longest {
-                        if sub.len() > longest_pal.len() {
-                            longest = Some(sub);
+                let sub = &line[x..y];
+                let is_pal = Solution::is_palindrome(sub);
+
+                if is_pal {
+                    // println!("x: {}, y: {}, sub: {}", x, y, sub);
+                    if let Some((start, end)) = longest {
+                        if sub.len() > line[start..end].len() {
+                            longest = Some((x, y));
                         }
                     } else {
-                        longest = Some(sub);
+                        longest = Some((x, y));
                     }
                 }
             }
         }
 
         match longest {
-            Some(sub) => String::from_utf8_lossy(sub).to_string(),
+            Some(sub) => String::from_utf8_lossy(&line[sub.0..sub.1]).to_string(),
             None => "".to_string(),
         }
     }
@@ -226,6 +215,12 @@ mod tests {
             Solution::longest_palindrome(String::from("bbb")),
             String::from("bbb")
         );
+    }
+
+    #[test]
+    fn test_longest_palindrome_big_payload() {
+        let val = Solution::longest_palindrome(String::from("wsgdzojcrxtfqcfkhhcuxxnbwtxzkkeunmpdsqfvgfjhusholnwrhmzexhfqppatkexuzdllrbaxygmovqwfvmmbvuuctcwxhrmepxmnxlxdkyzfsqypuroxdczuilbjypnirljxfgpuhhgusflhalorkcvqfknnkqyprxlwmakqszsdqnfovptsgbppvejvukbxaybccxzeqcjhmnexlaafmycwopxntuisxcitxdbarsicvwrvjmxsapmhbbnuivzhkgcrshokkioagwidhmfzjwwywastecjsolxmhfnmgommkoimiwlgwxxdsxhuwwjhpxxgmeuzhdzmuqhmhnfwwokgvwsznfcoxbferdonrexzanpymxtfojodcfydedlxmxeffhwjeegqnagoqlwwdctbqnuxngrgovrjesrkjrfjawknbrsfywljscfvnjhczhyeoyzrtbkvvfvofykkwoiclgxyaddhpdoztdhcbauaagjmfzkkdqexkczfsztckdlujgqzjyuittnudpldjvsbwbzcsazjpxrwfafievenvuetzcxynnmskoytgznvqdlkhaowjtetveahpjguiowkiuvikwewmgxhgfjuzkgrkqhmxxavbriftadtogmhlatczusxkktcsyrnwjbeshifzbykqibghmmvecwwtwdcscikyzyiqlgwzycptlxiwfaigyhrlgtjocvajcnqyenxrnjgogeqtvkxllxpuoxargzgcsfwavwbnktchwjebvwwhfghqkcjhuhuqwcdsixrkfjxuzvhjxlyoxswdlwfytgbtqbeimzzogzrlovcdpseoafuxfmrhdswwictsctawjanvoafvzqanvhaohgndbsxlzuymvfflyswnkvpsvqezekeidadatsymbvgwobdrixisknqpehddjrsntkqpsfxictqbnedjmsveurvrtvpvzbengdijkfcogpcrvwyf"));
+        println!("{}", val);
     }
 
     #[test]
