@@ -130,8 +130,62 @@ impl Solution {
         longest as i32
     }
 
+    pub fn is_palindrome(items: &[u8]) -> bool {
+        if items.len() <= 1 {
+            return true;
+        }
+
+        // Compare them from both ends inward
+        let mut left: usize = 0;
+        let mut right: usize = items.len() - 1;
+
+        while left <= right {
+            if items[left] != items[right] {
+                return false;
+            }
+            left += 1;
+            right -= 1;
+        }
+        true
+    }
+
     pub fn longest_palindrome(s: String) -> String {
-        todo!()
+        if s.len() <= 1 {
+            return s;
+        }
+
+        let items = s.as_bytes();
+        let mut longest: Option<&[u8]> = None;
+
+        // Brute force every possibility
+        for x in 0..(items.len() - 1) {
+            for y in (x + 1)..=items.len() {
+                //   0 1 2 3 4 5 6 7 8 9
+                //   0 1 2 3 4 5 6 7 8 9
+                // Slice it then check if it is a palindrome
+                let sub = &items[x..y];
+                if Solution::is_palindrome(sub) {
+                    println!(
+                        "x: {}, y: {}, sub: {}",
+                        x,
+                        y,
+                        String::from_utf8_lossy(sub).to_string()
+                    );
+                    if let Some(longest_pal) = longest {
+                        if sub.len() > longest_pal.len() {
+                            longest = Some(sub);
+                        }
+                    } else {
+                        longest = Some(sub);
+                    }
+                }
+            }
+        }
+
+        match longest {
+            Some(sub) => String::from_utf8_lossy(sub).to_string(),
+            None => "".to_string(),
+        }
     }
 }
 
@@ -142,6 +196,15 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_is_palindrome() {
+        assert_eq!(Solution::is_palindrome("a".as_bytes()), true);
+        assert_eq!(Solution::is_palindrome("aa".as_bytes()), true);
+        assert_eq!(Solution::is_palindrome("aaa".as_bytes()), true);
+        assert_eq!(Solution::is_palindrome("aba".as_bytes()), true);
+        assert_eq!(Solution::is_palindrome("abca".as_bytes()), false);
+    }
+
+    #[test]
     fn test_longest_palindrome() {
         assert_eq!(
             Solution::longest_palindrome(String::from("babad")),
@@ -150,6 +213,18 @@ mod tests {
         assert_eq!(
             Solution::longest_palindrome(String::from("cbbd")),
             String::from("bb")
+        );
+        assert_eq!(
+            Solution::longest_palindrome(String::from("a")),
+            String::from("a")
+        );
+        assert_eq!(
+            Solution::longest_palindrome(String::from("bb")),
+            String::from("bb")
+        );
+        assert_eq!(
+            Solution::longest_palindrome(String::from("bbb")),
+            String::from("bbb")
         );
     }
 
