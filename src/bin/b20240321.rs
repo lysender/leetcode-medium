@@ -6,31 +6,23 @@ struct Solution;
 
 impl Solution {
     pub fn max_area(height: Vec<i32>) -> i32 {
-        if height.len() < 2 {
-            return 0;
-        }
-
-        fn compute_area(config: &Vec<i32>, left: usize, right: usize) -> i32 {
-            let l_val = config[left];
-            let r_val = config[right];
-            l_val.min(r_val) * (right as i32 - left as i32)
-        }
-
         let mut l: usize = 0;
         let mut r: usize = height.len() - 1;
-        let mut area: i32 = compute_area(&height, l, r);
+        let mut area: i32 = 0;
 
         while l < r {
+            let l_val = height[l];
+            let r_val = height[r];
+            let current_area = l_val.min(r_val) * (r - l) as i32;
+            if current_area > area {
+                area = current_area;
+            }
+
             // Whichever is lower must move inward
             if height[l] < height[r] {
                 l += 1;
             } else {
                 r -= 1;
-            }
-
-            let new_area = compute_area(&height, l, r);
-            if new_area > area {
-                area = new_area;
             }
         }
         area
