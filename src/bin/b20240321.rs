@@ -1,5 +1,6 @@
 fn main() {
     Solution::max_area(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
+    Solution::three_sum(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
 }
 
 struct Solution;
@@ -27,11 +28,55 @@ impl Solution {
         }
         area
     }
+
+    pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut result: Vec<Vec<i32>> = Vec::new();
+        for i in 0..nums.len() {
+            for j in i + 1..nums.len() {
+                for k in j + 1..nums.len() {
+                    if nums[i] + nums[j] + nums[k] == 0 {
+                        let mut temp: Vec<i32> = vec![nums[i], nums[j], nums[k]];
+                        temp.sort();
+                        if !result.contains(&temp) {
+                            result.push(temp);
+                        }
+                    }
+                }
+            }
+        }
+        result
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn is_in_array(source: Vec<Vec<i32>>, target: Vec<Vec<i32>>) -> bool {
+        for i in target {
+            if !source.contains(&i) {
+                return false;
+            }
+        }
+        true
+    }
+
+    #[test]
+    fn test_three_sum() {
+        assert_eq!(
+            is_in_array(
+                Solution::three_sum(vec![-1, 0, 1, 2, -1, -4]),
+                vec![vec![-1, -1, 2], vec![-1, 0, 1]]
+            ),
+            true
+        );
+        assert_eq!(
+            is_in_array(Solution::three_sum(vec![0, 0, 0]), vec![vec![0, 0, 0]]),
+            true
+        );
+        let empty: Vec<Vec<i32>> = vec![];
+        assert_eq!(is_in_array(Solution::three_sum(vec![0, 1, 1]), empty), true);
+    }
 
     #[test]
     fn test_max_area() {
