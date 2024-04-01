@@ -94,10 +94,20 @@ impl Solution {
 
         // Sort list for faster search later on
         nums.sort();
+        let max = nums.last().unwrap();
 
         for x in 0..nums.len() {
             for y in x + 1..nums.len() {
+                if (y + 1) > nums.len() - 1 {
+                    continue;
+                }
+
                 let z_val = (nums[x] + nums[y]) * -1;
+                if z_val < nums[y + 1] || z_val > *max {
+                    // No need to check further
+                    continue;
+                }
+
                 let z_result = find_z(&nums, x, y, y + 1, z_val);
                 if let Some(z) = z_result {
                     let mut temp: Vec<i32> = vec![nums[x], nums[y], nums[z]];
