@@ -30,8 +30,8 @@ impl Solution {
     }
 
     pub fn three_sum(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
-        fn find_z(list: &Vec<i32>, x: usize, y: usize, z_val: i32) -> Option<usize> {
-            let mut low: i32 = 0;
+        fn find_z(list: &Vec<i32>, x: usize, y: usize, start: usize, z_val: i32) -> Option<usize> {
+            let mut low: i32 = start as i32;
             let mut high: i32 = list.len() as i32 - 1;
 
             while low <= high {
@@ -98,7 +98,7 @@ impl Solution {
         for x in 0..nums.len() {
             for y in x + 1..nums.len() {
                 let z_val = (nums[x] + nums[y]) * -1;
-                let z_result = find_z(&nums, x, y, z_val);
+                let z_result = find_z(&nums, x, y, y + 1, z_val);
                 if let Some(z) = z_result {
                     let mut temp: Vec<i32> = vec![nums[x], nums[y], nums[z]];
                     temp.sort();
@@ -181,6 +181,9 @@ mod tests {
         let result: Vec<Vec<i32>> = Solution::three_sum(vec![
             3, -2, 0, 9, -10, 6, -5, -3, -5, -3, 9, -3, 4, 4, -6, -1, 8, 9, -2, -6, 5, -8, 6,
         ]);
+
+        println!("{:?}", source);
+        println!("{:?}", result);
         assert_eq!(
             is_in_array(
                 result,
@@ -203,6 +206,23 @@ mod tests {
                     vec![-2, -2, 4],
                     vec![-2, -1, 3]
                 ]
+            ),
+            true
+        );
+    }
+
+    #[test]
+    fn test_three_sum_data3() {
+        let mut source = vec![-2, 0, 1, 1, 2];
+        source.sort();
+
+        let result = Solution::three_sum(vec![-2, 0, 1, 1, 2]);
+        println!("{:?}", source);
+        println!("{:?}", result);
+        assert_eq!(
+            is_in_array(
+                Solution::three_sum(vec![-2, 0, 1, 1, 2]),
+                vec![vec![-2, 0, 2], vec![-2, 1, 1]]
             ),
             true
         );
