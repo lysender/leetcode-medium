@@ -30,94 +30,49 @@ impl Solution {
     }
 
     pub fn three_sum(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
-        fn find_z(list: &Vec<i32>, x: usize, y: usize, start: usize, z_val: i32) -> Option<usize> {
-            let mut low: i32 = start as i32;
-            let mut high: i32 = list.len() as i32 - 1;
-
-            while low <= high {
-                let mid = low + ((high - low) / 2);
-                let val = list[mid as usize];
-                if val == z_val {
-                    if mid as usize != x && mid as usize != y {
-                        // Great, not duplicate
-                        return Some(mid as usize);
-                    } else {
-                        // Find another index down
-                        if (mid - 1) < 0 {
-                            return None;
-                        }
-
-                        let mut z_index = mid as usize - 1;
-                        while list[z_index] == z_val {
-                            if z_index != x && z_index != y {
-                                // Found it among duplicate values
-                                return Some(z_index);
-                            }
-                            if z_index == 0 {
-                                // We are out of bounds, try going up next
-                                break;
-                            }
-                            z_index -= 1;
-                        }
-
-                        // Still not found? Try going up among duplicates
-                        if (mid + 1) > (list.len() as i32 - 1) {
-                            return None;
-                        }
-                        let mut z_index = mid as usize + 1;
-                        while list[z_index] == z_val {
-                            if z_index != x && z_index != y {
-                                // Found it amount duplicates
-                                return Some(z_index);
-                            }
-                            if z_index >= list.len() - 1 {
-                                return None;
-                            }
-                            z_index += 1;
-                        }
-
-                        return None;
-                    }
-                } else if val > z_val {
-                    // Go lower
-                    high = mid - 1;
-                } else {
-                    // Go higher
-                    low = mid + 1;
-                }
-            }
-
-            None
-        }
-
         let mut result: Vec<Vec<i32>> = Vec::new();
-
-        // Sort list for faster search later on
         nums.sort();
-        let max = nums.last().unwrap();
 
-        for x in 0..nums.len() {
-            for y in x + 1..nums.len() {
-                if (y + 1) > nums.len() - 1 {
-                    continue;
-                }
+        // 0 = x + y + z
+        // Will do a first loop for x and do an inner loop with low/high pair for y and z
+        for x in 0..nums.len() - 2 {
+            // If we move forward and found same number, we probably already
+            // solved that combination from the previous iteration
+            // so no need to repeat it as the outcome is the same
+            if x > 0 && nums[x] == nums[x - 1] {
+                continue;
+            }
 
-                let z_val = (nums[x] + nums[y]) * -1;
-                if z_val < nums[y + 1] || z_val > *max {
-                    // No need to check further
-                    continue;
-                }
+            // Find the 2 numbers so that 0 = nums[x] + nums[y] + nums[z]
+            let mut y = x + 1;
+            let mut z = nums.len() - 1;
 
-                let z_result = find_z(&nums, x, y, y + 1, z_val);
-                if let Some(z) = z_result {
-                    let mut temp: Vec<i32> = vec![nums[x], nums[y], nums[z]];
-                    temp.sort();
-                    if !result.contains(&temp) {
-                        result.push(temp);
+            while y < z {
+                let sum = nums[x] + nums[y] + nums[z];
+                if sum > 0 {
+                    // Too high, we need to lower our upper bound
+                    z -= 1;
+                } else if sum < 0 {
+                    // To low, we need to increase our lower bound
+                    y += 1;
+                } else {
+                    // Must be equal, we found our pair
+                    result.push(vec![nums[x], nums[y], nums[z]]);
+
+                    // Move our lower bound higher
+                    // We may be able to use the opposite side but we will
+                    // just increase our lower bound for now
+                    y += 1;
+
+                    // Skip a couple of items if the next items are same values
+                    // as we don't support duplicate items
+                    while nums[y] == nums[y - 1] && y < z {
+                        y += 1;
                     }
                 }
             }
         }
+
         result
     }
 }
@@ -127,6 +82,9 @@ mod tests {
     use super::*;
 
     fn is_in_array(source: Vec<Vec<i32>>, target: Vec<Vec<i32>>) -> bool {
+        if source.len() != target.len() {
+            return false;
+        }
         for i in target {
             if !source.contains(&i) {
                 return false;
@@ -168,6 +126,12 @@ mod tests {
             is_in_array(Solution::three_sum(vec![0, 0, 0]), vec![vec![0, 0, 0]]),
             true
         );
+
+        assert_eq!(
+            is_in_array(Solution::three_sum(vec![0, 0, 0, 0]), vec![vec![0, 0, 0]]),
+            true
+        );
+
         let empty: Vec<Vec<i32>> = vec![];
         assert_eq!(is_in_array(Solution::three_sum(vec![0, 1, 1]), empty), true);
     }
@@ -192,8 +156,6 @@ mod tests {
             3, -2, 0, 9, -10, 6, -5, -3, -5, -3, 9, -3, 4, 4, -6, -1, 8, 9, -2, -6, 5, -8, 6,
         ]);
 
-        println!("{:?}", source);
-        println!("{:?}", result);
         assert_eq!(
             is_in_array(
                 result,
@@ -223,12 +185,6 @@ mod tests {
 
     #[test]
     fn test_three_sum_data3() {
-        let mut source = vec![-2, 0, 1, 1, 2];
-        source.sort();
-
-        let result = Solution::three_sum(vec![-2, 0, 1, 1, 2]);
-        println!("{:?}", source);
-        println!("{:?}", result);
         assert_eq!(
             is_in_array(
                 Solution::three_sum(vec![-2, 0, 1, 1, 2]),
