@@ -1,6 +1,7 @@
 fn main() {
     Solution::max_area(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
     Solution::three_sum(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
+    Solution::letter_combinations("".to_string());
 }
 
 struct Solution;
@@ -75,11 +76,92 @@ impl Solution {
 
         result
     }
+
+    pub fn letter_combinations(digits: String) -> Vec<String> {
+        // Map 2-9 to 0-7
+        let map: Vec<&str> = vec!["abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+
+        // Collect the selected keys
+        let key_maps: Vec<Vec<u8>> = digits
+            .chars()
+            .map(|i| {
+                let key: usize = i.to_string().parse().unwrap();
+                map[key - 2].to_string().as_bytes().to_vec()
+            })
+            .collect();
+
+        // Generate the combinations
+        fn gen_combinations(
+            map: &Vec<Vec<u8>>,
+            combi: &mut Vec<String>,
+            prefix: Vec<u8>,
+            index: usize,
+        ) {
+            let group = &map[index];
+
+            if index == map.len() - 1 {
+                // End of the line, let's push all combinations
+                for i in group.iter() {
+                    let mut new_prefix = prefix.clone();
+                    new_prefix.push(*i);
+                    let str = String::from_utf8_lossy(&new_prefix).to_string();
+                    combi.push(str);
+                }
+            } else {
+                // Still need to run all other keys
+                for i in group.iter() {
+                    let mut new_prefix = prefix.clone();
+                    new_prefix.push(*i);
+
+                    gen_combinations(map, combi, new_prefix, index + 1);
+                }
+            }
+        }
+
+        let mut result: Vec<String> = Vec::new();
+
+        if key_maps.len() > 0 {
+            gen_combinations(&key_maps, &mut result, vec![], 0);
+        }
+
+        result
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_letter_combinations_1() {
+        let input = String::from("23");
+        let expected: Vec<String> = vec![
+            "ad".to_string(),
+            "ae".to_string(),
+            "af".to_string(),
+            "bd".to_string(),
+            "be".to_string(),
+            "bf".to_string(),
+            "cd".to_string(),
+            "ce".to_string(),
+            "cf".to_string(),
+        ];
+        assert_eq!(Solution::letter_combinations(input), expected);
+    }
+
+    #[test]
+    fn test_letter_combinations_2() {
+        let input = String::from("");
+        let expected: Vec<String> = Vec::new();
+        assert_eq!(Solution::letter_combinations(input), expected);
+    }
+
+    #[test]
+    fn test_letter_combinations_3() {
+        let input = String::from("2");
+        let expected: Vec<String> = vec!["a".to_string(), "b".to_string(), "c".to_string()];
+        assert_eq!(Solution::letter_combinations(input), expected);
+    }
 
     fn is_in_array(source: Vec<Vec<i32>>, target: Vec<Vec<i32>>) -> bool {
         if source.len() != target.len() {
