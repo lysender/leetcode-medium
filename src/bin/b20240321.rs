@@ -1,7 +1,10 @@
+use leetcode_medium::ListNode;
+
 fn main() {
     Solution::max_area(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
     Solution::three_sum(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
     Solution::letter_combinations("".to_string());
+    Solution::remove_nth_from_end(None, 1);
 }
 
 struct Solution;
@@ -126,11 +129,66 @@ impl Solution {
 
         result
     }
+
+    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        // Use a naive solution
+        // Get the length of the list
+        // Traverse again up to target - 1, remove target and point next to the next item
+        let mut length: i32 = 0;
+        let mut node: &Option<Box<ListNode>> = &head;
+        while let Some(node_val) = node {
+            length += 1;
+            node = &node_val.next;
+        }
+
+        // Create a new list to contain the result with node removed from it
+        let mut result = Some(Box::new(ListNode::new(0)));
+        let mut current = result.as_mut();
+        let mut node = &head;
+        let mut x: i32 = 1;
+
+        while let Some(node_val) = node {
+            if (length - x + 1) != n {
+                current.as_mut().unwrap().next = Some(Box::new(ListNode::new(node_val.val)));
+                current = current.unwrap().next.as_mut();
+            }
+            x += 1;
+            node = &node_val.next;
+        }
+
+        result.unwrap().next
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use leetcode_medium::{create_list, list_to_vec};
+
     use super::*;
+
+    #[test]
+    fn test_removed_nth_from_end_1() {
+        let input = create_list(vec![1, 2, 3, 4, 5]);
+        let expected: Vec<i32> = vec![1, 2, 3, 5];
+        let output = Solution::remove_nth_from_end(input, 2);
+        assert_eq!(list_to_vec(output), expected);
+    }
+
+    #[test]
+    fn test_removed_nth_from_end_2() {
+        let input = create_list(vec![1]);
+        let expected: Vec<i32> = vec![];
+        let output = Solution::remove_nth_from_end(input, 1);
+        assert_eq!(list_to_vec(output), expected);
+    }
+
+    #[test]
+    fn test_removed_nth_from_end_3() {
+        let input = create_list(vec![1, 2]);
+        let expected: Vec<i32> = vec![1];
+        let output = Solution::remove_nth_from_end(input, 1);
+        assert_eq!(list_to_vec(output), expected);
+    }
 
     #[test]
     fn test_letter_combinations_1() {
