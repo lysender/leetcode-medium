@@ -5,6 +5,7 @@ fn main() {
     Solution::three_sum(vec![1, 8, 6, 2, 5, 4, 8, 3, 7]);
     Solution::letter_combinations("".to_string());
     Solution::remove_nth_from_end(None, 1);
+    Solution::generate_parenthesis(1);
 }
 
 struct Solution;
@@ -158,6 +159,10 @@ impl Solution {
 
         result.unwrap().next
     }
+
+    pub fn generate_parenthesis(n: i32) -> Vec<String> {
+        vec![]
+    }
 }
 
 #[cfg(test)]
@@ -165,6 +170,20 @@ mod tests {
     use leetcode_medium::{create_list, list_to_vec};
 
     use super::*;
+
+    #[test]
+    fn test_generate_parenthesis_1() {
+        let expected = vec!["((()))", "(()())", "(())()", "()(())", "()()()"];
+        let expected_res: Vec<String> = expected.iter().map(|x| x.to_string()).collect();
+        assert_eq!(Solution::generate_parenthesis(3), expected_res);
+    }
+
+    #[test]
+    fn test_generate_parenthesis_2() {
+        let expected = vec!["()"];
+        let expected_res: Vec<String> = expected.iter().map(|x| x.to_string()).collect();
+        assert_eq!(Solution::generate_parenthesis(1), expected_res);
+    }
 
     #[test]
     fn test_removed_nth_from_end_1() {
